@@ -1,0 +1,11 @@
+﻿  mainCode.cpp
+C:\Users\jnister\OneDrive - Eastside Preparatory School\school files\Independent Project\OpenGLHelloWorld\OpenGLHelloWorld\mainCode.cpp(222,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\jnister\OneDrive - Eastside Preparatory School\school files\Independent Project\OpenGLHelloWorld\OpenGLHelloWorld\mainCode.cpp(230,25): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\jnister\OneDrive - Eastside Preparatory School\school files\Independent Project\OpenGLHelloWorld\OpenGLHelloWorld\mainCode.cpp(449,27): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\jnister\OneDrive - Eastside Preparatory School\school files\Independent Project\OpenGLHelloWorld\OpenGLHelloWorld\mainCode.cpp(463,27): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+  Generating code
+  1 of 448 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    8 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  OpenGLHelloWorld.vcxproj -> C:\Users\jnister\OneDrive - Eastside Preparatory School\school files\Independent Project\OpenGLHelloWorld\x64\Release\OpenGLHelloWorld.exe

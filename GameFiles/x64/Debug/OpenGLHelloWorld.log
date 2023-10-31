@@ -1,0 +1,10 @@
+﻿  glad.c
+  headerCompiler.cpp
+  mainCode.cpp
+C:\Users\jnister\OneDrive - Eastside Preparatory School\school files\Independent Project\OpenGLHelloWorld\OpenGLHelloWorld\mainCode.cpp(223,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\jnister\OneDrive - Eastside Preparatory School\school files\Independent Project\OpenGLHelloWorld\OpenGLHelloWorld\mainCode.cpp(233,25): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\jnister\OneDrive - Eastside Preparatory School\school files\Independent Project\OpenGLHelloWorld\OpenGLHelloWorld\mainCode.cpp(464,27): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\jnister\OneDrive - Eastside Preparatory School\school files\Independent Project\OpenGLHelloWorld\OpenGLHelloWorld\mainCode.cpp(479,27): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+  Generating Code...
+LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
+  OpenGLHelloWorld.vcxproj -> C:\Users\jnister\OneDrive - Eastside Preparatory School\school files\Independent Project\OpenGLHelloWorld\x64\Debug\OpenGLHelloWorld.exe
