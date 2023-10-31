@@ -1,3 +1,6 @@
+// Completed with research done from Learn OpenGL by Joey DeVries - https://learnopengl.com/
+// Utility functions such as image loading and structure of the camera class are taken from the textbook.
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -21,12 +24,6 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods); 
 void processInput(GLFWwindow* window);
 unsigned int loadTexture(const char* path);
-//float setBounds(float x, float min, float max);
-
-//#include <GL/gl.h>
-//glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-//glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-//glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 
 float deltaTime = 0.0f; 
@@ -93,7 +90,7 @@ int main()
 
 
 	float vertices[] = {
-		// positions          // normals           // texture coords
+		// positions          // normal vectors       // texture coords
 		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
 		 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
 		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
@@ -147,26 +144,6 @@ int main()
 
 	glBindVertexArray(cubeVAO);
 
-	/*
-	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	// normal attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-
-
-	// second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
-	unsigned int lightCubeVAO;
-	glGenVertexArrays(1, &lightCubeVAO);
-	glBindVertexArray(lightCubeVAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	// note that we update the lamp's position attribute's stride to reflect the updated buffer data
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	*/
-
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	// normal attribute
@@ -177,20 +154,18 @@ int main()
 	glEnableVertexAttribArray(2);
 
 
-	// second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
+	// configure light's VAO
 	unsigned int lightCubeVAO;
 	glGenVertexArrays(1, &lightCubeVAO);
 	glBindVertexArray(lightCubeVAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	// note that we update the lamp's position attribute's stride to reflect the updated buffer data
+
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	//unsigned int diffuseMap = loadTexture("falcon.jpg");
-	//unsigned int diffuseMap = loadTexture("container2.png");
-	//unsigned int diffuseMap2 = loadTexture("wall.png");
 	
+	// load textures from images
 	unsigned int diffuseMap = loadTexture("asteroid.jpg");
 	unsigned int diffuseMapStars = loadTexture("stars.jpg");
 	unsigned int diffuseMapShip = loadTexture("falcon.jpg");
@@ -205,7 +180,7 @@ int main()
 
 
 	const int numCubes = 25; 
-	
+	// set random cube coordinates
 	glm::vec3 cubeCoords[numCubes] = {}; 
 	for (int i = 0; i < numCubes; i++)
 	{
@@ -218,8 +193,8 @@ int main()
 	
 	glm::vec3 cubeDirs[numCubes] = {}; 
 	int cubeSpeeds[numCubes] = {};
-	//float X = 2.0f; 
 	srand(time(NULL));
+	// set random cube directions and speeds
 	for (int i = 0; i < numCubes; i++)
 	{
 		glm::vec3 adjustvec = glm::vec3((-10.0f + (rand() % (-10 - 10 + 1))),
@@ -248,6 +223,7 @@ int main()
 	glfwSetWindowShouldClose(window, false);
 	while (!glfwWindowShouldClose(window))
 	{
+		// update times
 		float currentFrame = static_cast<float>(glfwGetTime());
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
@@ -256,6 +232,7 @@ int main()
 
 		processInput(window);
 
+		// if game not over, update asteroid velocities 
 		if (!lost)
 		{
 			if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -266,7 +243,6 @@ int main()
 					VVelocity = maxVelocity;
 				}
 			}
-			//camera.Pitch += 0.5; 
 			if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 			{
 				VVelocity = VVelocity - acceleration * deltaTime;
@@ -275,7 +251,6 @@ int main()
 					VVelocity = -maxVelocity;
 				}
 			}
-			//camera.Pitch -= 0.5;
 			if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 			{
 				HVelocity = HVelocity + acceleration * deltaTime;
@@ -297,17 +272,20 @@ int main()
 		cout << "horizontal velocity: " << HVelocity << endl; 
 		cout << "vertical velocity: " << VVelocity << endl;
 
+		// also update the ship's coordinates
 		if (!lost) 
 		{
 			shipCoords.y = shipCoords.y + VVelocity * deltaTime * 100;
 			shipCoords.x = shipCoords.x + HVelocity * deltaTime * 100;
 		}
 
+		// bounds in space
 		if (shipCoords.x >= xclip) shipCoords.x = xclip; 
 		if (shipCoords.y >= yclip) shipCoords.y = yclip; 
 		if (shipCoords.x <= -xclip) shipCoords.x = -xclip;
 		if (shipCoords.y <= -yclip) shipCoords.y = -yclip;
 
+		// maximum camera rotation angles
 		camera.upTheta = HVelocity * 0.5f;
 		if (camera.upTheta >= maxRoll) camera.upTheta = maxRoll; 
 		if (camera.upTheta <= -maxRoll) camera.upTheta = -maxRoll;
@@ -316,51 +294,23 @@ int main()
 		if (camera.upTheta >= maxPitch) camera.upTheta = maxPitch;
 		if (camera.upTheta <= -maxPitch) camera.upTheta = -maxPitch;
 		
-
+		// move fireball
 		fireballCoords = fireballCoords + glm::normalize(fireballDirection) * (fireballVelocity * deltaTime); 
 
-
-		/*
-		if (!lost)
-		{
-			if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-				shipCoords.y = shipCoords.y + velocity;
-				//camera.Pitch += 0.5; 
-			if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-				shipCoords.y = shipCoords.y - velocity;
-				//camera.Pitch -= 0.5;
-			if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-				shipCoords.x = shipCoords.x - velocity;
-			if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-				shipCoords.x = shipCoords.x + velocity;
-		}
-		*/
 
 		camera.ProcessFrame(deltaTime, shipCoords);
 
 		// rendering commands here
 
 		// RGB values, and alpha (transparancy)
-		//glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		// clear the color and depth from the last frame
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
+		// shaders
 		ourShader.use();
-		//ourShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-		//ourShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 		glm::vec3 objectColor = glm::vec3(1.0f, 0.5f, 0.31f);
 		glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
-		//glm::vec3 lightColor;
-		//lightColor.x = sin(glfwGetTime() * 2.0f);
-		//lightColor.y = sin(glfwGetTime() * 0.7f);
-		//lightColor.z = sin(glfwGetTime() * 1.3f);
-
-		//int transLocation = glGetUniformLocation(ourShader.ID, "objectColor");	
-		//glUniform3fv(transLocation, 1, &objectColor[0]);
-		//transLocation = glGetUniformLocation(ourShader.ID, "lightColor");
-		//glUniform3fv(transLocation, 1, &lightColor[0]);
 
 		transLocation = glGetUniformLocation(ourShader.ID, "viewPos");
 		glUniform3fv(transLocation, 1, &camera.Position[0]);
@@ -401,29 +351,13 @@ int main()
 		glUniformMatrix4fv(transLocation, 1, GL_FALSE, &projMat[0][0]);
 
 
-		//move the light source
-		//lightPos.x = 1.0f + sin(glfwGetTime()) * 2.0f; 
-		//lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f; 
-
 		transLocation = glGetUniformLocation(ourShader.ID, "light.position");
 		glUniform3fv(transLocation, 1, &lightPos[0]);
 
-		//cube dir is the direction that the cube is currently moving (and will continue moving until boundary 5)
+		//cube dir is the direction that the cube is currently moving (and will continue moving until boundary 15)
 		//cube change are the change of coordinates since the last frame
 		//cube change then gets applied to cube shift, which is the cube's coordinates (or shift from 0)
 
-		//check for out of bounds
-		/* this is random direction
-		if (absCoord.x > 5 || absCoord.y > 5 || absCoord.z > 5)
-		{
-			//reassign a new direction
-			// needs to be optimized so that it has to go away from whichever boundary it bumped into
-			cubeDir = glm::vec3(static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / X)), static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / X)), static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / X)));
-			cubeDir = cubeDir - 1.0f;
-		}
-		*/
-		// collisions
-		
 		for (int i = 0; i < numCubes; i++)
 		{
 			//ship collision
@@ -463,7 +397,7 @@ int main()
 				cubeSpeeds[i] = (6.0f + (rand() % (1 + 15 + 1)));
 			}
 
-			//moving
+			//moving (asteroids don't move in first five seconds)
 			if (!lost && static_cast<float>(glfwGetTime()) >= 5.0)
 			{
 				glm::vec3 cubeChange = deltaTime * cubeSpeeds[i] * cubeDirs[i];
@@ -471,62 +405,8 @@ int main()
 				cubeCoords[i] = cubeCoords[i] + cubeChange;
 			}
 		}
-
-		/*
-		for (int i = 0; i < numCubes; i++)
-		{
-			//collision first
-			glm::vec3 distanceVec = camera.Position - cubeCoords[i];
-			float distance = glm::length(distanceVec); 
-			if (distance <= 1.0f) lost = true; 
-
-			//then bounce
-			glm::vec3 absCoord = glm::abs(cubeCoords[i]);
-			if (absCoord.x > 5)
-			{
-				cubeDirs[i] = glm::vec3(-cubeDirs[i].x, cubeDirs[i].y, cubeDirs[i].z);
-			}
-			if (absCoord.y > 5)
-			{
-				cubeDirs[i] = glm::vec3(cubeDirs[i].x, -cubeDirs[i].y, cubeDirs[i].z);
-			}
-			if (absCoord.z > 5)
-			{
-				cubeDirs[i] = glm::vec3(cubeDirs[i].x, cubeDirs[i].y, -cubeDirs[i].z);
-			}
-		}
-
-		//camera movement restriction
-		camera.Position.x = setBounds(camera.Position.x, -5.0f, 5.0f);
-		camera.Position.y = setBounds(camera.Position.y, -5.0f, 5.0f);
-		camera.Position.z = setBounds(camera.Position.z, -5.0f, 5.0f);
-
-
-		// can increase the constant here over time to make the game harder
-		if (!lost)
-		{
-			for (int i = 0; i < numCubes; i++)
-			{
-				glm::vec3 cubeChange = deltaTime * 6 * cubeDirs[i];
-				cubeCoords[i] = cubeCoords[i] + cubeChange;
-			}
-		}
-		*/
-
-		/*
-		glm::mat4 modelMat = glm::mat4(1.0f);
-		modelMat = glm::translate(modelMat, shipCoords);
-		modelMat = glm::rotate(modelMat, (float)glfwGetTime() * glm::radians(20.0f), glm::vec3(0.5f, 0.5f, 0.5f));
-		transLocation = glGetUniformLocation(ourShader.ID, "model");
-		glUniformMatrix4fv(transLocation, 1, GL_FALSE, &modelMat[0][0]);
-
-
-		glBindTexture(GL_TEXTURE_2D, diffuseMap);
-
-		glBindVertexArray(cubeVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		*/
 		
+		// asteroid rotations and translations
 		for (int i = 0; i < numCubes; i++)
 		{
 			glm::mat4 modelMat = glm::mat4(1.0f);
@@ -546,13 +426,7 @@ int main()
 		}
 		
 		
-		
-		// star box
 		glm::mat4 modelMat = glm::mat4(1.0f);
-		//movement speed 2.5 
-		//glm::vec3 ztrans = glm::vec3(0.0f, 0.0f, - 2.3 * tottime); 
-		//boxloc = camera.Position.z; 
-		//modelMat = glm::translate(modelMat, ztrans);
 		modelMat = glm::scale(modelMat, glm::vec3(100.0f));
 		transLocation = glGetUniformLocation(ourShader.ID, "model");
 		glUniformMatrix4fv(transLocation, 1, GL_FALSE, &modelMat[0][0]);
@@ -564,8 +438,6 @@ int main()
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		
 		//player 
-
-
 		modelMat = glm::mat4(1.0f); 
 		modelMat = glm::translate(modelMat, shipCoords);
 		//modelMat = glm::rotate(modelMat, glm::radians(3.14159f), glm::vec3(0.5f, 0.0f, 0.0f));
@@ -575,7 +447,6 @@ int main()
 		glBindVertexArray(cubeVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		
-
 
 		// fireball
 		if (fireball)
@@ -592,10 +463,7 @@ int main()
 		}
 
 
-
-
-		//now for the lamp object
-
+		//lamp object
 		lightCubeShader.use();
 		transLocation = glGetUniformLocation(lightCubeShader.ID, "projection");
 		glUniformMatrix4fv(transLocation, 1, GL_FALSE, &projMat[0][0]);
@@ -605,7 +473,6 @@ int main()
 
 		modelMat = glm::mat4(1.0f);
 		modelMat = glm::translate(modelMat, lightPos);
-		//modelMat = glm::scale(modelMat, glm::vec3(0.2f)); // smaller cube
 
 		transLocation = glGetUniformLocation(lightCubeShader.ID, "model");
 		glUniformMatrix4fv(transLocation, 1, GL_FALSE, &modelMat[0][0]);
@@ -614,7 +481,6 @@ int main()
 		glBindVertexArray(lightCubeVAO); 
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
-		//camera.ProcessFrame(deltaTime);
 
 		glfwSwapBuffers(window); 
 		// check for events and call callback functions
@@ -636,7 +502,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 {
 	//no movement out of the plane
-	//return; 
 	float xpos = static_cast<float>(xposIn);
 	float ypos = static_cast<float>(yposIn);
 
@@ -670,22 +535,6 @@ void processInput(GLFWwindow* window)
 	{
 		glfwSetWindowShouldClose(window, true);
 	}
-
-	//const float cameraSpeed = static_cast<float>(2.5f * deltaTime); 
-	//glm::vec3 absCoord = glm::abs(camera.Position);
-	/*
-	if (!lost)
-	{
-		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-			camera.ProcessKeyboard(FORWARD, deltaTime);
-		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-			camera.ProcessKeyboard(BACKWARD, deltaTime);
-		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-			camera.ProcessKeyboard(LEFT, deltaTime);
-		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-			camera.ProcessKeyboard(RIGHT, deltaTime);
-	}
-	*/
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -699,14 +548,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 }
 
-/*
-float setBounds(float x, float min, float max)
-{
-	if (x < min) x = min; 
-	if (x > max) x = max; 
-	return x; 
-}
-*/
 
 unsigned int loadTexture(char const* path)
 {
